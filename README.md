@@ -10,6 +10,4 @@ conda env create -f environment.yml
 ```
 
 ## Run
-```
-```
-
+- Run the scripts of main_*.py
