@@ -1,6 +1,6 @@
 import collections
 
-from data import load_fakefriends, print_rdd
+from data import load_fakefriends_data, print_rdd
 
 
 def count_average_friends_by_age(rdd):
@@ -16,7 +16,7 @@ def count_average_friends_by_age(rdd):
 
 
 def main():
-    rdd = load_fakefriends()
+    rdd = load_fakefriends_data()
     print_rdd(rdd)
     print()
 
