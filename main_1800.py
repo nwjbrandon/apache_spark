@@ -15,6 +15,18 @@ def get_min_temperature_by_stations(rdd):
         print("Station: %s | Min Temperature: %f" % (key, value))
 
 
+def get_max_temperature_by_stations(rdd):
+    print("Get maximum temperature by stations")
+    min_temperatures = rdd.filter(lambda x: "TMAX" in x[2])
+    min_temperatures = min_temperatures.map(lambda x: (x[0], x[3]))
+    min_temperatures = min_temperatures.reduceByKey(lambda x, y: max(x, y))
+    min_temperatures = collections.OrderedDict(
+        sorted(min_temperatures.collect())
+    )
+    for key, value in min_temperatures.items():
+        print("Station: %s | Max Temperature: %f" % (key, value))
+
+
 def main():
     rdd = load_temperature_1800_data()
     print_rdd(rdd)
@@ -22,6 +34,10 @@ def main():
 
     # Get minimum temperatue by station
     get_min_temperature_by_stations(rdd)
+    print()
+
+    # Get maximum temperatue by station
+    get_max_temperature_by_stations(rdd)
     print()
 
 
