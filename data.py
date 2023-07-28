@@ -39,3 +39,9 @@ def load_temperature_1800_data():
         )
     )
     return rdd
+
+
+def load_book_data():
+    # sentences
+    rdd = sc.textFile("data/book.txt")
+    return rdd
