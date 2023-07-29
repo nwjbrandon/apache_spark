@@ -45,3 +45,10 @@ def load_book_data():
     # sentences
     rdd = sc.textFile("data/book.txt")
     return rdd
+
+
+def load_customer_orders_data():
+    lines = sc.textFile("data/customer-orders.csv")
+    rdd = lines.map(lambda x: x.split(","))
+    rdd = rdd.map(lambda x: (x[0], x[1], float(x[2])))
+    return rdd
