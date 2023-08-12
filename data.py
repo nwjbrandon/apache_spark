@@ -95,8 +95,18 @@ def load_book_data(use_df=False):
         return rdd
 
 
-def load_customer_orders_data():
-    lines = sc.textFile("data/customer-orders.csv")
-    rdd = lines.map(lambda x: x.split(","))
-    rdd = rdd.map(lambda x: (x[0], x[1], float(x[2])))
-    return rdd
+def load_customer_orders_data(use_df=False):
+    if use_df:
+        schema = StructType(
+            [
+                StructField("cust_id", IntegerType(), True),
+                StructField("item_id", IntegerType(), True),
+                StructField("amount_spent", FloatType(), True),
+            ]
+        )
+        return spark.read.schema(schema).csv("data/customer-orders.csv")
+    else:
+        lines = sc.textFile("data/customer-orders.csv")
+        rdd = lines.map(lambda x: x.split(","))
+        rdd = rdd.map(lambda x: (x[0], x[1], float(x[2])))
+        return rdd
