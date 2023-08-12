@@ -1,6 +1,6 @@
 import collections
 
-from data import load_fakefriends_data, print_df, print_rdd
+from data import load_fakefriends_data, load_fakefriends_headers_data, print_df, print_rdd
 
 
 def count_average_friends_by_age(rdd):
@@ -16,7 +16,7 @@ def count_average_friends_by_age(rdd):
 
 
 def count_average_friends_by_age_spark(schema):
-    df = schema.groupBy("age").avg("n_friends").orderBy("age")
+    df = schema.groupBy("age").avg("friends").orderBy("age")
     df.show()
 
 
@@ -30,6 +30,14 @@ def main():
     print()
 
     schema = load_fakefriends_data(use_df=True)
+    print_df(schema)
+    print()
+
+    # Get average friends by age with spark
+    count_average_friends_by_age_spark(schema)
+    print()
+
+    schema = load_fakefriends_headers_data(use_df=True)
     print_df(schema)
     print()
 

@@ -33,7 +33,7 @@ def load_fakefriends_data(use_df=False):
                 user_id=int(x[0]),
                 name=str(x[1].encode("utf-8")),
                 age=int(x[2]),
-                n_friends=int(x[3]),
+                friends=int(x[3]),
             )
         )
         schema = spark.createDataFrame(rdd).cache()
@@ -43,6 +43,19 @@ def load_fakefriends_data(use_df=False):
         lines = sc.textFile("data/fakefriends.csv")
         rdd = lines.map(lambda x: x.split(","))
         return rdd
+
+
+def load_fakefriends_headers_data(use_df=False):
+    # user id | name | age | number of friends
+    if use_df:
+        schema = (
+            spark.read.option("header", "true")
+            .option("inferSchema", "true")
+            .csv("data/fakefriends-header.csv")
+        )
+        return schema
+    else:
+        raise NotImplementedError
 
 
 def load_temperature_1800_data():
