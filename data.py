@@ -1,5 +1,6 @@
 from pyspark import SparkConf, SparkContext
 from pyspark.sql import Row, SparkSession
+from pyspark.sql.types import FloatType, IntegerType, StringType, StructField, StructType
 
 conf = SparkConf().setMaster("local").setAppName("MySpark")
 sc = SparkContext(conf=conf)
@@ -58,19 +59,30 @@ def load_fakefriends_headers_data(use_df=False):
         raise NotImplementedError
 
 
-def load_temperature_1800_data():
+def load_temperature_1800_data(use_df=False):
     # station id | time | temperature type | temperature
-    lines = sc.textFile("data/1800.csv")
-    rdd = lines.map(lambda x: x.split(","))
-    rdd = rdd.map(
-        lambda x: (
-            x[0],
-            int(x[1]),
-            x[2],
-            float(x[3]) * 0.1 * (9.0 / 5.0) + 32.0,
+    if use_df:
+        schema = StructType(
+            [
+                StructField("stationID", StringType(), True),
+                StructField("date", IntegerType(), True),
+                StructField("measure_type", StringType(), True),
+                StructField("temperature", FloatType(), True),
+            ]
         )
-    )
-    return rdd
+        return spark.read.schema(schema).csv("data/1800.csv")
+    else:
+        lines = sc.textFile("data/1800.csv")
+        rdd = lines.map(lambda x: x.split(","))
+        rdd = rdd.map(
+            lambda x: (
+                x[0],
+                int(x[1]),
+                x[2],
+                float(x[3]) * 0.1 * (9.0 / 5.0) + 32.0,
+            )
+        )
+        return rdd
 
 
 def load_book_data(use_df=False):
