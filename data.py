@@ -1,6 +1,6 @@
 from pyspark import SparkConf, SparkContext
 from pyspark.sql import Row, SparkSession
-from pyspark.sql.types import FloatType, IntegerType, StringType, StructField, StructType
+from pyspark.sql.types import FloatType, IntegerType, LongType, StringType, StructField, StructType
 
 conf = SparkConf().setMaster("local").setAppName("MySpark")
 sc = SparkContext(conf=conf)
@@ -17,11 +17,26 @@ def print_rdd(rdd, n=5):
         print(entry)
 
 
-def load_ml_100k_data():
+def load_ml_100k_data(use_df=False):
     # user id | item id | rating | timestamp
-    lines = sc.textFile("data/ml-100k/u.data")
-    rdd = lines.map(lambda x: x.split())
-    return rdd
+    if use_df:
+        schema = StructType(
+            [
+                StructField("userID", IntegerType(), True),
+                StructField("movieID", IntegerType(), True),
+                StructField("rating", IntegerType(), True),
+                StructField("timestamp", LongType(), True),
+            ]
+        )
+        return (
+            spark.read.option("sep", "\t")
+            .schema(schema)
+            .csv("data/ml-100k/u.data")
+        )
+    else:
+        lines = sc.textFile("data/ml-100k/u.data")
+        rdd = lines.map(lambda x: x.split())
+        return rdd
 
 
 def load_fakefriends_data(use_df=False):
