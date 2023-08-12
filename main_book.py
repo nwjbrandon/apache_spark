@@ -1,7 +1,10 @@
 import collections
 import re
 
-from data import load_book_data, print_rdd
+from pyspark.sql import functions as func
+from pyspark.sql.functions import col
+
+from data import load_book_data, print_df, print_rdd
 
 
 def count_word_occurences(rdd):
@@ -42,6 +45,18 @@ def count_word_occurences_after_preprocessing_and_sorting(rdd):
         print("Word: %s | Occurences: %i" % (key, value))
 
 
+def count_word_occurences_after_preprocessing_and_sorting_spark(schema):
+    print("Get sorted word occurences after preprocessing")
+    words = schema.select(
+        func.explode(func.split(schema.value, "\\W+")).alias("word")
+    )
+    words.filter(words.word != "")
+    lowercase_words = words.select(func.lower(words.word).alias("word"))
+    word_counts = lowercase_words.groupBy("word").count()
+    word_counts_sorted = word_counts.sort(col("count").desc())
+    word_counts_sorted.show()
+
+
 def main():
     rdd = load_book_data()
     print_rdd(rdd)
@@ -57,6 +72,14 @@ def main():
 
     # Get word occurences after preprocessing and sorting
     count_word_occurences_after_preprocessing_and_sorting(rdd)
+    print()
+
+    schema = load_book_data(use_df=True)
+    print_df(schema)
+    print()
+
+    # Get word occurences after preprocessing and sorting with spark
+    count_word_occurences_after_preprocessing_and_sorting_spark(schema)
     print()
 
 

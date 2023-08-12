@@ -73,10 +73,14 @@ def load_temperature_1800_data():
     return rdd
 
 
-def load_book_data():
+def load_book_data(use_df=False):
     # sentences
-    rdd = sc.textFile("data/book.txt")
-    return rdd
+    if use_df:
+        schema = spark.read.text("data/book.txt")
+        return schema
+    else:
+        rdd = sc.textFile("data/book.txt")
+        return rdd
 
 
 def load_customer_orders_data():
