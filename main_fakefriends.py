@@ -1,5 +1,7 @@
 import collections
 
+from pyspark.sql import functions as func
+
 from data import load_fakefriends_data, load_fakefriends_headers_data, print_df, print_rdd
 
 
@@ -16,7 +18,11 @@ def count_average_friends_by_age(rdd):
 
 
 def count_average_friends_by_age_spark(schema):
-    df = schema.groupBy("age").avg("friends").orderBy("age")
+    df = (
+        schema.groupBy("age")
+        .agg(func.round(func.avg("friends"), 2).alias("friends_avg"))
+        .sort("age")
+    )
     df.show()
 
 
